@@ -151,6 +151,99 @@ $cDB->Query("CREATE TABLE trades_pending (
 
 /* END upgrade to 0.4.0 */
 
+/* BEGIN upgrade to 1.0 */
+
+
+// Some alterations to existing tables...
+$cDB->Query("ALTER TABLE `cdm_pages` add permission int(2)") or die("Error altering cdm_pages table.  Does the web user account have alter table permission?");
+
+
+$cDB->Query("ALTER TABLE `member` add restriction int(1)") or die("Error altering member table.  Does the web user account have alter table permission?");
+
+$cDB->Query("alter table member change admin_note admin_note text") or die("Error altering member table.  Does the web user account have alter table permission?");
+
+// Create the new tables...
+$cDB->Query("CREATE TABLE `income_ties` (
+  `id` int(11) NOT NULL auto_increment,
+  `member_id` varchar(15) default NULL,
+  `tie_id` varchar(15) default NULL,
+  `percent` int(3) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=12") or die("Error creating income_ties table.  Does the web user account have add table permission?");
+
+
+$cDB->Query("CREATE TABLE `settings` (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(255) default NULL,
+  `display_name` varchar(255) default NULL,
+  `typ` varchar(10) default NULL,
+  `current_value` text,
+  `options` varchar(255) default NULL,
+  `default_value` text,
+  `max_length` varchar(5) default '99999',
+  `descrip` text,
+  `section` int(1) default NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=35") or die("Error creating settings table.  Does the web user account have add table permission?");
+
+// Populate the settings table...
+$cDB->Query("INSERT INTO `settings` VALUES ('8', 'LEECH_EMAIL_URUNLOCKED', '\'Account Restriction Lifted\' Email', 'longtext', '', '', 'Restrictions on your account have been lifted.', '', 'Define email that is sent out when restrictions are lifted on an account.', '3')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('6', 'LEECH_EMAIL_URLOCKED', '\'Account Restricted\' Email', 'longtext', '', '', 'Dear Member\r\n\r\nWe have been reviewing members balances as we are concerned to ensure that trading goes back and forth on an equitable basis so that members are able to keep their accounts close to zero.  We recognise that situations sometimes occur that lead to things getting out of balance.  Therefore to assist you, we have restricted expenditure on your account for the time being. If have any queries about this, or if we can assist you in any particular way, please let us know, and we will review the situation in due course. The LETS Administrator ', '', 'Define email that is sent out when restrictions are imposed on an account.', '3')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('10', 'MEM_LIST_DISPLAY_BALANCE', 'Display Member Balance', 'bool', '', '', 'TRUE', '', 'Do you want to display member balances in the Members List? (Balances are always visible to Admins and Committee members regardless of what is set here.)', '7')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('11', 'TAKE_SERVICE_FEE', 'Enable Take Service Charge', 'bool', '', '', 'TRUE', '', 'Do you want the option of taking a service charge from members as and when?', '2')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('12', 'SHOW_INACTIVE_MEMBERS', 'Show Inactive Members in Members List', 'bool', '', '', 'FALSE', '', 'Do you want to display Inactive members in the Member List?', '7')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('13', 'SHOW_RATE_ON_LISTINGS', 'Show Rate on Listings', 'bool', '', '', 'TRUE', '', 'Do you want to display the Rate alongside the offers/wants in the main listings?', '7')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('14', 'SHOW_POSTCODE_ON_LISTINGS', 'Show Postcode on Listings', 'bool', '', '', 'TRUE', '', 'Do you want to display the PostCode alongside the offers/wants in the main listings?', '7')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('15', 'NUM_CHARS_POSTCODE_SHOW_ON_LISTINGS', 'Postcode Length (in chars)', 'int', '', '', '4', '', 'If you have elected to display the postcode on offers/wants listings, how much of the PostCode do you want to show? (the number you enter will be the number of characters displayed, so for eg if you just want to show the first 3 characters of the postcode then put 3.', '7')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('16', 'OVRIDE_BALANCES', 'Enable Balance Override', 'bool', '', '', 'FALSE', '', 'Do you want admins to have the option to override Balances on a per member basis? This can be useful during the initial site set-up for inputting existing balances. Link will appear in admin panel if set to TRUE.  Use with CAUTION to avoid the database going out of balance', '6')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('17', 'MEMBERS_CAN_INVOICE', 'Enable Member-to-Member Invoicing', 'bool', '', '', 'TRUE', '', 'Do you want to allow members to invoice one-another via the site? (The recipient is always given the option to confirm/reject payment of the invoice)', '2')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('18', 'ALLOW_IMAGES', 'Allow Members to Upload Images', 'bool', '', '', 'TRUE', '', 'Do you want to allow members to upload an image of themselves, to be displayed with their personal profile?', '4')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('19', 'SOC_NETWORK_FIELDS', 'Enable Social Networking Fields', 'bool', '', '', 'TRUE', '', 'Do you want to enable the Social Networking profile fields (Age, Sex, etc)?', '4')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('20', 'OOB_ACTION', 'Out Of Balance Behaviour', 'multiple', '', 'FATAL,SILENT', 'SILENT', '', ' If, whilst processing a trade, the database is found to be out of balance, what should the system do?\n\nFATAL = Aborts the trade and informs the user why.\n\nSILENT = Continues with trade, displays no notifications whatsoever (NOTE: you can still set the option below to have an email notification sent to the admin)', '6')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('21', 'OOB_EMAIL_ADMIN', 'Email Admin on Out Of Balance', 'bool', '', '', 'TRUE', '', 'Should the system send the Admin an email when the database is found to be out of balance?', '6')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('24', 'EMAIL_FROM', 'Email From Address', '', '', '', 'From: reply@my-domain.org', '', 'Email sent from this site will show as coming from this address', '1')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('25', 'USE_RATES', 'Use Rates Fields', 'bool', '', '', 'TRUE', '', 'If turned on, listings will include a \"Rate\" field', '7')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('26', 'TAKE_MONTHLY_FEE', 'Enable Monthly Fee', 'bool', '', '', 'TRUE', '', 'Do you want to enable Monthly Fees', '2')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('27', 'MONTHLY_FEE', 'Monthly Fee Amount', 'int', '', '', '1', '', 'How much should the Monthly Fee be?', '2')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('28', 'EMAIL_LISTING_UPDATES', 'Send Listing Updates via Email', 'bool', '', '', 'FALSE', '', 'Should users receive automatic updates for new and modified listings?', '1')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('29', 'DEFAULT_UPDATE_INTERVAL', 'Default Email Listings Update Interval', 'multiple', '', 'NEVER,WEEKLY,MONTHLY', 'NEVER', '', 'If automatic updates are sent, this is the default interval.', '1')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('30', 'EXPIRE_INACTIVE_ACCOUNTS', 'Expire Inactive Accounts ', 'bool', '', '', 'FALSE', '', 'Should inactive accounts have their listings automatically expired? This can be a useful feature.  It is an attempt to deal with the age-old local currency problem of new members joining and then not keeping their listings up to date or using the system in any way. It is designed so that if a member doesnt record a trade OR update a listing in a given period of time (default is six months), their listings will be set to expire and they will receive an email to that effect (as will the admin).', '5')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('31', 'MAX_DAYS_INACTIVE', 'Expire Accounts After x Days of Inactivity', 'int', '', '', '180', '', 'After this many days, accounts that have had no activity will have their listings set to expire.  They will have to reactiveate them individually if they still want them.', '5')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('32', 'EXPIRATION_WINDOW', 'Account Expiration Window', 'int', '', '', '15', '', 'How many days in the future the expiration date will be set for', '5')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('33', 'DELETE_EXPIRED_AFTER', 'Delete Expired Listings After x Days', 'int', '', '', '90', '', 'How long should expired listings hang around before they are deleted?', '5')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('34', 'ALLOW_INCOME_SHARES', 'Allow Income Sharing', 'bool', '', null, 'TRUE', '99999', 'Do you want to allow members to share a percentage of any income they generate with another account of their choosing? The member can specify the exact percentage they wish to donate.', '2')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('35', 'LEECH_NOTICE', 'Message Displayed to Leecher who tries to trade', 'longtext', '', '', 'Restrictions have been imposed on your account which prevent you from trading outwards, Please contact the administrator for more information.', '', 'Leecher sees this notice when trying to send money.', '3')") or die("Error - Could not insert row into settings table.");
+
+$cDB->Query("INSERT INTO `settings` VALUES ('36', 'SHOW_GLOBAL_FEES', 'Show monthly fees and service charges in global exchange view', 'bool', '', null, 'FALSE', '', 'Do you want to show monthly fees and service charges in the global exchange view? (Note: individual members will still be able to see this in their own personal exchange history).', '7')") or die("Error - Could not insert row into settings table.");
+
+
+/* END upgrade to 1.0 */
+
 				
 $p->DisplayPage("Database has been created. Click <A HREF=member_login.php>here</A> to login.");
 

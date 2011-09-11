@@ -1,3 +1,153 @@
+/* Local Exchange UK version 1.0 release notes */
+
+/* 22-06-2009 - changes by Chris Macdonald <chris@cdmweb.co.uk> and Rob Follett <robfol@gmail.com> */
+
+(Original release notes for 0.4.0 included beneath all this)
+
+*****************************************************
+/* New 1.0 Functionality */
+
+/* NEW FEATURES */
+
+[ADDED] Ability to assign permissions to info pages (Guest, Member, Committee, and Admin)
+[ADDED] Ability to impose account restrictions on 'leechers' who take without giving
+[ADDED] Ability to take and refund 'One-Off Service Charges' independent of 'Take Monthly Fee'
+[ADDED] Ability for members to share a percentage of their income with another member account
+[ADDED] 'Printer Friendly View' (all pages, uses its own customisable style sheet, print.css)
+[ADDED] Ability to backup MySQL database
+[ADDED] Moved some settings from the config file to the mysql where they can be edited via the admin panel
+
+/* ADDITIONAL TWEEKS/CHANGES/BUG FIXES */
+
+[ADDED] Ability, when Unlock/Reset Account Password, to choose between sending member a 'password reset' or 'welcome' email
+[ADDED] Option to display member balance in members' list (this is always visible to admins, option applies to what users see)
+[CHANGE] Override Balance feature now only available to Admins, not Committee members
+[CHANGE] Guests can no longer view link to offers/wants (which previously contained sensitive members-only info)
+[ADDED] Number of 'active member accounts' now displayed at footer of Member's List
+[CHANGE] Unlock Account/Reset Password in admin menu now admin-only function (not committee)
+[CHANGE] Site logo now links to homepage
+[ADDED] Checks for presence of 'upgrade.php' on server and prompts for it's removal before proceeding
+
+*****************************************************
+/* FILES Changed */
+	
+	*includes/inc.config.php:
+		(): added settings re Account Restrictions
+		(): made site logo link to homepage
+		(): added option to display member balance in member list
+		(): added version number to footer
+		(): commented out lots of settings now moved to mysql
+		
+	*member_photo_upload.php:
+		(): added code to allow admin to upload/replace photos on members' behalf
+		
+	*trades_pending.php:
+		(): added code to disallow restricted member from paying an invoice
+		
+	*member_unlock.php:
+		(): Changed permissions level to Admins rather than Committee
+		(): Added option to send either a 'password reset' or 'welcome' email to members
+		
+	*member_directory.php:
+		(): added code to display number of active member accounts
+		(): added code to display current member balance
+		
+	*classes/class.listing.php:
+		cListingGroup::DisplayListingGroup(): guests can no longer view link to offer/want, instead the link is displayed in plain blue (apologies if you have a blue website). This is because the url contains sensitive members-only info.
+		
+	*classes/class.trade.php:
+		cTrade::MakeTrade(): added code to check if member's account is restricted
+		
+	*trade.php:
+		(): added code to display notice to user that their account has been restricted	
+		(): added code to process income ties
+		
+	*member_login:
+		(): added code to display notice to user upon logging in that their account has been restricted
+		
+	*edit_balance.php:
+		(): changed page permissions to admins only
+	
+	*balance_to_edit.php:
+		(): changed page permissions to admins only
+	
+	*admin_menu.php:
+		(): changed Override Balance link to only display to admins
+		(): added link to Edit Info Page Permissions
+		(): added link to Manage Account Restrictions
+		(): Unlock Account/Reset Password only shows to admins now
+		(): Added links to new features
+		(): Removed link to 'Spreadsheet Backup' (it doesn't work)
+		
+	*pages.php:
+		(): added code to handle page Permissions
+	
+	*member_profile.php
+		(): added link to 'Income Shares'
+	
+	*trades_pending.php:
+		doTrade(): added code to handle income shares
+		
+	*classes/class.member.php:
+		cMember::AccountIsRestricted(): new function added to check if account has been 'locked'
+		cMember::LoadMember(): added code to store 'restriction' status
+		(): added class cIncomeTies();
+	
+	*classes/class.page.php:
+		cPage::MakePageFooter(): added link to 'printer friendly view' & code to display printer friendly view
+	
+	*pages.php():
+		(): added code to handle printer friendly view
+		(): made 'Edit' link smaller (cosmetic)
+		
+	*info/credits.php():
+		(): now displays 'UK' and version number dynamically from globals file
+	
+	*includes/global.php():
+		(): added call to include 'class.settings'
+		(): updated version number to 1.0
+		
+*****************************************************
+/* FILES Added */
+
+	*info_permissions.php
+	
+	*manage_restrictions.php
+	
+	*service_charge.php
+	
+	*refund_service_charge.php
+	
+	*photo_to_edit.php
+	
+	*income_ties.php
+	
+	*mysql_backup.php
+	
+	*settings.php
+	
+	*classes/class.settings.php
+	
+	*images/print.gif
+	
+	*print.css
+
+*****************************************************
+/* MySQL Changes/Additions */
+
+	*alter table cdm_pages - added 'permission' column
+	
+	*alter table member - added 'restriction' column
+	
+	*alter table member - change 'admin_note' column type to 'text'
+	
+	*create table 'income_ties'
+	
+	*create table 'settings'
+
+
+	
+*****************************************************
 /* Local Exchange version 0.4.0 release notes */
 
 /* 13-01-2009 - changes by Chris Macdonald <chris@cdmweb.co.uk>, Rob Follett <robfol@gmail.com> */
@@ -187,7 +337,7 @@
 
 Below are the original release notes for 0.3.2... 
 
-PLEASE NOTE THAT UPGRADE INSTRUCTIONS BELOW NO LONGER APPLY TO ver 0.4.0 - to upgrade from ver 0.3.2 to ver 0.4.0 please use the UPGRADE package (localexchange-upgrade-0.4.0.zip) instead of this package (localexchange-0.4.0.zip)
+PLEASE NOTE THAT UPGRADE INSTRUCTIONS BELOW NO LONGER APPLY TO ver 0.4.0 or version 1.0 UK - to upgrade from ver 0.3.2 to ver 0.4.0 please use the UPGRADE package (localexchange-upgrade-0.4.0.zip) instead of this package (localx-UK-1.0.zip), and to upgrade from ver 0.4.0 to ver 1.0 UK please use the UPGRADE package (localx-UK-upgrade-0.4-to-1.0.zip). All these files are available via LETSlinkUK and http://cxss.info
 
 -------------
 

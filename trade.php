@@ -126,7 +126,10 @@ function process_data ($values) {
 			
 			if ($_REQUEST["typ"]!=1) { // This is a payment
 				
-				if ($cDB->Query("INSERT INTO trades_pending (trade_date, member_id_from, member_id_to, amount, category, description, typ) VALUES (now(), ". 	$cDB->EscTxt($member->member_id) .", ". $cDB->EscTxt($member_to_id) .", ". $cDB->EscTxt($values["units"]) .", ". $cDB->EscTxt($values["category"]) .", ". 	$cDB->EscTxt($values["description"]) .", \"T\");")) {
+				if ($member->restriction==1) {
+					$list .= "<p>".LEECH_NOTICE;
+				}
+				else if ($cDB->Query("INSERT INTO trades_pending (trade_date, member_id_from, member_id_to, amount, category, description, typ) VALUES (now(), ". 	$cDB->EscTxt($member->member_id) .", ". $cDB->EscTxt($member_to_id) .", ". $cDB->EscTxt($values["units"]) .", ". $cDB->EscTxt($values["category"]) .", ". 	$cDB->EscTxt($values["description"]) .", \"T\");")) {
 					
 					$mailed = mail($member_to->person[0]->email, "Payment Received on ".SITE_LONG_TITLE."", "Hi ".$member_to_id.",\n\nJust letting you know that you have received a new payment from ".$member->member_id."\n\nAs you have elected to confirm all payments made to you, please log into your account now and confirm or reject this payment using the following URL...\n\nhttp://".SERVER_DOMAIN.SERVER_PATH_URL."/trades_pending.php?action=incoming", EMAIL_FROM);
 			
@@ -159,10 +162,33 @@ function process_data ($values) {
 		
 		$status = $trade->MakeTrade();
 		
-		if(!$status)
+		if(!$status) {
 			$list .= "Trade failed!  Please try again later.";
+
+			if ($member->restriction==1)
+				$list .= LEECH_NOTICE;
+		}
 		else
 			$list .= "You have transferred ". $values['units'] ." ". strtolower(UNITS) ." to ". $member_to_id .".  Would you like to <A HREF=trade.php?mode=".$_REQUEST["mode"]."&member_id=". $_REQUEST["member_id"].">record another</A> exchange?<P>Or would you like to leave <A HREF=feedback.php?mode=". $_REQUEST["mode"] ."&author=". $member->member_id ."&about=". $member_to_id ."&trade_id=". $trade->trade_id .">feedback</A> for this member?";
+		
+		// Has the recipient got an income tie set-up? If so, we need to transfer a percentage of this elsewhere...
+		
+			$recipTie = cIncomeTies::getTie($member_to_id);
+			
+			if ($recipTie && ALLOW_INCOME_SHARES==true) {
+				
+				$member_to = new cMember;
+				$member_to->LoadMember($member_to_id);
+	
+				$theAmount = round(($values['units']*$recipTie->percent)/100);
+				
+				$charity_to = new cMember;
+				$charity_to->LoadMember($recipTie->tie_id);
+	
+				$trade2 = new cTrade($member_to, $charity_to, htmlspecialchars($theAmount), htmlspecialchars(12), htmlspecialchars("Donation from ".$member_to_id.""), 'T');
+		
+				$status = $trade2->MakeTrade();
+			}
 	}
 	
    $p->DisplayPage($list);

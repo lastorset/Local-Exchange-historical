@@ -1,20 +1,8 @@
 <?php
 
-/**
- * Returns monthly fees for a certain batch.  First it asks to select which
- * batch of fee is to be returned.  Then it asks for a confirmation.  And
- * lastly, it does the transfer and provides a feedback.
- *
- * GET arguments:
- *     TID = transfer id.
- *     CID = confirmation id.
- *     - these are mainly used for preventing double refunds in case of page
- *       refresh and backbutton presses.
- */
-
 include_once("includes/inc.global.php");
 $p->site_section = ADMINISTRATION;
-$p->page_title = "Refund monthly fee";
+$p->page_title = "Refund Service Charge";
 
 
 // *** Starts main() ***
@@ -47,7 +35,7 @@ function select_time()
     $ts = time();
     $year = strftime("%Y", $ts);
     $month = strftime("%m", $ts);
-    $trade_type = TRADE_MONTHLY_FEE;
+    $trade_type = "S";
     $refunded = TRADE_MONTHLY_FEE_REVERSAL;
 
     // We'll show only the monthly fees taken during the last 12 months.
@@ -63,17 +51,18 @@ function select_time()
     {
         $selection_list .=
             "<option value=\"$row->trade_date\">$row->trade_date</option>";
+        
+
     }
 
     if (empty($selection_list))
     {
-        return "No monthly transfers found.";
+        return "No service charges found.";
     }
 
     $html = <<<ENDHTML
         <form method="GET" action="">
           <input type="hidden" name="CID" value="$ts" />
-
           <select name="selected_time">
             $selection_list
           </select>
@@ -92,12 +81,12 @@ ENDHTML;
  */
 function confirmation($cid, $selected_time)
 {
-    if( !defined("TAKE_MONTHLY_FEE"))
+    if( !defined("TAKE_SERVICE_FEE"))
     {
-        return "This system isn't setup to process monthly fees.";
+        return "This system isn't setup to process service fees.";
     }
 
-    if(isset($_SESSION["LAST_CID"]) && $cid <= $_SESSION["LAST_CID"])
+    if($ignore==true && isset($_SESSION["LAST_CID"]) && $cid <= $_SESSION["LAST_CID"])
     {
         return "Action already executed.  Start from the administration
                     page for a new refund.";
@@ -109,7 +98,7 @@ function confirmation($cid, $selected_time)
 
     $ts = time();
     $html = <<<ENDHTML
-        You are about to refund the monthly fee taken on
+        You are about to refund the service charge taken on
         <em>$selected_time</em>.
 
         <form method="GET" action="">
@@ -133,8 +122,8 @@ ENDHTML;
 /*
  * Does the actual fee transfer from member accounts to the system account.
  */
-function transfer_fee($tid, $trade_time)
-{
+function transfer_fee($tid, $trade_time) {
+	
     // Make sure this transaction has not been done before.
     if(isset($_SESSION["LAST_TID"]) && $tid <= $_SESSION["LAST_TID"])
     {
@@ -148,13 +137,22 @@ function transfer_fee($tid, $trade_time)
     }
 
     global $cDB, $monthly_fee_exempt_list;
-    $monthly_fee = MONTHLY_FEE;
+   
+	   $sql = "select * from trades where trade_date='$trade_time'";
+	   
+   //echo $sql;
+   
+    $result = $cDB->Query($sql);
+		
+		$row = mysql_fetch_array($result);
+
+    $monthly_fee = $row["amount"];
     $system_account_id = SYSTEM_ACCOUNT_ID;
     $member_table = DATABASE_MEMBERS;
     $trade_table = DATABASE_TRADES;
     $trade_type_monthly = TRADE_MONTHLY_FEE;
     $trade_type = TRADE_MONTHLY_FEE_REVERSAL;
-    $desc = "Refund for monthly fee taken on $trade_time";
+    $desc = "Refund for ".$row["description"]." taken on $trade_time";
     
     // Transaction starts.
     $cDB->Query("BEGIN");
@@ -164,15 +162,14 @@ function transfer_fee($tid, $trade_time)
     // We don't want to charge inactive accounts.
     $query0 = "select trade_id, member_id_from from " . DATABASE_TRADES .
                   " where trade_date = $trade_time 
-                      and type='$trade_type_monthly'
+                      and type='S'
                       and member_id_to = '$system_account_id'";
     $result0 = $cDB->Query($query0);
 
     // This single timestamp will be applied to every transfer done in
     // this transaction.  This is for the ease of identification of this
     // batch of transfer later.
-    $ts = time();
-
+ 
     while ($row = mysql_fetch_object($result0))
     {
     		
@@ -193,8 +190,7 @@ function transfer_fee($tid, $trade_time)
 	                             where member_id = '$system_account_id'";
 	        $result3 = $cDB->Query($query3);
 	
-	        $query4 = "update $trade_table set status = '$trade_type',
-	                       trade_date = $trade_time where
+	        $query4 = "update $trade_table set status = '$trade_type' where
 	                           trade_id = ".$row->trade_id."";
 	        $result4 = $cDB->Query($query4);
 	

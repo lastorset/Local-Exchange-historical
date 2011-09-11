@@ -13,17 +13,19 @@ if(!extension_loaded('gd')) {
 }
 
 $p->site_section = EVENTS;
-$p->page_title = "Upload a Photo";
 
 $member = new cMember;
 
 if($_REQUEST["mode"] == "admin") {
 	$cUser->MustBeLevel(1);
 	$member->LoadMember($_REQUEST["member_id"]);
-	$p->page_title .= " for ". $member->DisplayName();
+	
+	$p->page_title = "Upload/Replace photo for ".$member->member_id;
 } else {
 	$cUser->MustBeLoggedOn();
 	$member = $cUser;
+	$p->page_title = "Upload a Photo";
+
 }
 
 $query = $cDB->Query("SELECT filename FROM ".DATABASE_UPLOADS." WHERE title=".$cDB->EscTxt("mphoto_".$member->member_id)." limit 0,1;");

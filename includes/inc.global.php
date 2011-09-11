@@ -55,7 +55,7 @@ define("WEEKLY_LISTING_UPDATES","W"); // Logging event category - System Event
 define("MONTHLY_LISTING_UPDATES","M"); // Logging event category - System Event
 
 /*********************************************************/
-define("LOCALX_VERSION", "0.4.0");
+define("LOCALX_VERSION", "1.0");
 
 /**********************************************************/
 /***************** DATABASE VARIABLES *********************/
@@ -104,6 +104,10 @@ include_once(CLASSES_PATH ."class.login_history.php");
 include_once(CLASSES_PATH ."class.member.php");
 include_once(CLASSES_PATH ."class.page.php");
 include_once(CLASSES_PATH ."class.logging.php");
+include_once(CLASSES_PATH ."class.settings.php");
+
+global $site_settings;
+
 
 // The following is necessary because of a PHP 4.4 bug with passing references
 error_reporting( E_ALL & ~E_NOTICE );

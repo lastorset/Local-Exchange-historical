@@ -138,8 +138,26 @@ function doTrade($t) {
 	
 	if(!$status)
 		return false;
-	else
+	else {
+		
+			// Has the recipient got an income tie set-up? If so, we need to transfer a percentage of this elsewhere...
+		
+			$recipTie = cIncomeTies::getTie($member_to->member_id);
+			
+			if ($recipTie) {
+				
+				$theAmount = round(($t['amount']*$recipTie->percent)/100);
+				
+				$charity_to = new cMember;
+				$charity_to->LoadMember($recipTie->tie_id);
+	
+				$trade = new cTrade($member_to, $charity_to, htmlspecialchars($theAmount), htmlspecialchars(12), htmlspecialchars("Donation from ".$member_to->member_id.""), 'T');
+		
+				$status = $trade->MakeTrade();
+			}
+			
 		return true;
+	}
 }
 
 switch($_REQUEST["action"]) {
@@ -377,8 +395,16 @@ switch($_REQUEST["action"]) {
 							$row["member_id_to"] = $goingTo;
 							$row["member_id_from"] = $goingFrom;
 							*/
-							if (!doTrade($row))
-								$list .= "<font color=red>Error sending payment.</font>";
+							if (!doTrade($row)) {
+								
+								$member = new cMember;
+								$member->LoadMember($_SESSION["user_login"]);
+								if ($member->restriction==1) {
+									$list .= LEECH_NOTICE;
+								}
+								else
+									$list .= "<font color=red>Error sending payment.</font>";
+							}
 							else {
 								
 								$cDB->Query("UPDATE trades_pending set status=".$cDB->EscTxt('F')." where id=".$cDB->EscTxt($_GET["tid"])."");

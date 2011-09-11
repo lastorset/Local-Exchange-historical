@@ -292,8 +292,11 @@ class cListingGroup
 				// a small change to the way member info is displayed i.e. (joe bloggs - 212)
 				$memInfo = " (<em>".stripslashes($row["first_name"])." ".stripslashes($row["last_name"])."</em> - <a href=member_summary.php?member_id=".$listing->member_id.">". $listing->member_id .")</a></center>";
 				
-				$output .= "<A HREF=http://".HTTP_BASE."/listing_detail.php?type=". $this->type ."&title=" . urlencode($listing->title) ."&member_id=". $listing->member_id ."><FONT SIZE=2>" . $listing->title ."</font></A><font size=2>". $details ."</FONT>";
-				
+				if ($cUser->IsLoggedOn())
+					$output .= "<A HREF=http://".HTTP_BASE."/listing_detail.php?type=". $this->type ."&title=" . urlencode($listing->title) ."&member_id=". $listing->member_id ."><FONT SIZE=2>" . $listing->title ."</font></A><font size=2>". $details ."</FONT>";
+				else
+					$output .= "<FONT SIZE=2 color=blue>" . $listing->title ."</font> <font size=2>". $details ."</FONT>";
+						
 				// Rate
 				if (SHOW_RATE_ON_LISTINGS==true && $listing->rate) {
 				

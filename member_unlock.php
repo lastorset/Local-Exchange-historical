@@ -1,7 +1,7 @@
 <?php
 include_once("includes/inc.global.php");
 
-$cUser->MustBeLevel(1);
+$cUser->MustBeLevel(2);
 $p->site_section = ADMINISTRATION;
 $p->page_title = "Unlock Account and Reset Password";
 
@@ -15,7 +15,8 @@ $form->addElement("select", "member_id", "Choose the Member Account", $ids->Make
 
 $form->addElement("static", null, null, null);
 $form->addElement("submit", "btnSubmit", "Unlock and Reset");
-
+$form->addElement("radio", "emailTyp", "", "Send 'Password Reset' email","pword");
+$form->addElement("radio", "emailTyp", "", "Send 'Welcome' Email","welcome");
 
 if ($form->validate()) { // Form is validated so processes the data
    $form->freeze();
@@ -40,10 +41,21 @@ function process_data ($values) {
 	$member->ChangePassword($password); // This will bomb out if the password change fails
 	
 	$list .= "The password has been reset";
-	$mailed = mail($member->person[0]->email, PASSWORD_RESET_SUBJECT, PASSWORD_RESET_MESSAGE . "\n\nMember ID: ". $member->member_id ."\nNew Password: ". $password, EMAIL_FROM);
+	
+	if ($_REQUEST["emailTyp"]=='welcome') {
+		
+		$mailed = mail($member->person[0]->email, NEW_MEMBER_SUBJECT, NEW_MEMBER_MESSAGE . "\n\nMember ID: ". $member->member_id ."\n". "Password: ". $password, EMAIL_FROM);
+			
+		$whEmail = "'Welcome'";
+	}
+	else {
+		$mailed = mail($member->person[0]->email, PASSWORD_RESET_SUBJECT, PASSWORD_RESET_MESSAGE . "\n\nMember ID: ". $member->member_id ."\nNew Password: ". $password, EMAIL_FROM);
+		
+		$whEmail = "'Password Reset'";
+	}
 
 	if($mailed)
-		$list .= " and sent to the member's email address (". $member->person[0]->email .").";
+		$list .= " and a $whEmail email has been sent to the member's email address (". $member->person[0]->email .").";
 	else
 		$list .= ". <I>However, the attempt to email the new password failed.  This is most likely due to a technical problem.  Contact your administrator at ". PHONE_ADMIN ."</I>.";	
 	$p->DisplayPage($list);

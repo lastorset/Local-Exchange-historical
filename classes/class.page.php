@@ -85,20 +85,42 @@ class cPage {
 	}
 									
 	function MakePageFooter() {
-		return "</TD></TR>". $this->page_footer ."</BODY></HTML>";
+		
+		global $cUser;
+		
+		if ($cUser->IsLoggedOn()) {
+		$tmp .= "</td></tr><tr><td id=\"footer\" colspan=2><p align=center>
+			<a href=".$_SERVER["PHP_SELF"]."?printer_view=1&".$_SERVER["QUERY_STRING"]." target=_blank><img src=http://".IMAGES_PATH ."print.gif border=0><br><font size=1>Printer Friendly View</font></a>";
+		}
+		
+		$tmp .= "</TD></TR>". $this->page_footer ."";
+	
+		$tmp .= "</BODY></HTML>";
+		
+		return $tmp;
 	}	
 			
 	function DisplayPage($content = "") {
-		global $cErr;
+		global $cErr, $cUser;
 		if ($content=="")
 			$cErr->Error("DisplayPage() was called with no content included!  Was a blank page intended?",ERROR_SEVERITY_HIGH,__FILE__,__LINE__);
+		
+		if ($_REQUEST["printer_view"]!=1 || !$cUser->IsLoggedOn()) { 
+			print $this->MakePageHeader();
+			print $this->MakePageMenu();	
+		}
+		else {
 	
-		print $this->MakePageHeader();
-		print $this->MakePageMenu();	
+			print '<head><link rel="stylesheet" href="http://'. HTTP_BASE .'/print.css" 				type="text/css"></link></head>';
+		}
+		
 		print $this->MakePageTitle();
 		
 		print $content;
-		print $this->MakePageFooter();
+		
+		if ($_REQUEST["printer_view"]!=1 || !$cUser->IsLoggedOn()) { 
+			print $this->MakePageFooter();
+		}
 	}	
 	
 	

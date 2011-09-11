@@ -37,8 +37,13 @@ $output .=
     <TD><FONT SIZE=2><B>Phone</B></FONT></TD>
     <TD><FONT SIZE=2><B>" . ADDRESS_LINE_2 . "</B></FONT></TD>
     <TD><FONT SIZE=2><B>" . ADDRESS_LINE_3 . "</B></FONT></TD>
-    <TD><FONT SIZE=2><B>" . ZIP_TEXT . "</B></FONT></TD>
-  </TR>";
+    <TD><FONT SIZE=2><B>" . ZIP_TEXT . "</B></FONT></TD>";
+
+if (MEM_LIST_DISPLAY_BALANCE==true || $cUser->member_role >= 1)  {   
+	$output .= "<TD><FONT SIZE=2><B>Balance</B></FONT></TD>";
+
+}
+$output .= "</TR>";
 
 //Phones (comma separated with first name in parentheses for non-primary phones)
 //Emails (comma separated with first name in parentheses for non-primary emails)
@@ -167,15 +172,22 @@ if($member_list->members) {
 					   <TD><FONT SIZE=2>". $member->AllPhones() ."</FONT></TD>
 					   <TD><FONT SIZE=2>". $member->person[0]->address_street2 ."&nbsp;</FONT></TD>
 					   <TD><FONT SIZE=2>". $member->person[0]->address_city . "&nbsp;</FONT></TD>
-					   <TD><FONT SIZE=2>". $member->person[0]->address_post_code ."</FONT></TD>
-					 </TR>";
+					   <TD><FONT SIZE=2>". $member->person[0]->address_post_code ."</FONT></TD>";
+					   
+				
+				if (MEM_LIST_DISPLAY_BALANCE==true || $cUser->member_role >= 1)
+					$output .= "<TD><FONT SIZE=2>". $member->balance ."</FONT></TD>";
+					
+				$output .= "</TR>";
 				$i+=1;
 		 }
 	 } // end loop to force display of inactive members off
 }
 } 
 
-$output .= "</TABLE>";
+// $output .= "</TABLE>";
+// RF display active accounts 
+$output .= '<TR><TD colspan=5><br><br>Total of '.$i.' active accounts.</TD></TR></TABLE>';
 
 $p->DisplayPage($output); 
 

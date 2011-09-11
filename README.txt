@@ -5,11 +5,19 @@ Requirements:
 	- MySQL 3.23 or higher with InnoDB table support*
 	- Pear system and the libraries specified below 
 
-==== New version 0.4.0 UK ====
-N.B. - This package (localexchange-0.4.0.zip) is for installing a NEW site using version 0.4.0 from scratch. 
+==== New version 1.0 UK ====
+N.B. - This package (localx-UK-1.0.zip) is for installing a NEW site using version 1.0 from scratch. 
 We suggest you read RELEASENOTES.txt before attempting to install for an overview and understanding of new features and bug fixes introduced since 0.3.2 
 
-If you already have a version of Local Exchange installed, please use the UPGRADE package (localexchange-upgrade-0.4.0.zip) and instructions contained within it instead of this archive. Please note that the current upgrade package is ONLY for upgrading an existing site running version 0.3.2 to version 0.4.0 (version is defined as LOCALX_VERSION in includes/inc.global.php).
+If you already have a version of Local Exchange 0.3.2 installed, please 
+
+1) use the UPGRADE package (localexchange-upgrade-0.4.0.zip) and instructions contained within it instead of this archive to upgrade to version 0.4.0.  
+
+Once you have Local Exchange version 0.4.0 installed
+
+2) use the UPGRADE package (localx-UK-upgrade-0.4-to-1.0.zip) to upgrade to version 1.0 UK
+
+Please note that the current upgrade package (localx-UK-upgrade-0.4-to-1.0.zip)is ONLY for upgrading an existing site running version 0.4.0 to version 1.0 (version is defined as LOCALX_VERSION in includes/inc.global.php).
 
 Chris Macdonald and Rob Follett
 ==============================

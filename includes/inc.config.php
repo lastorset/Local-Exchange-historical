@@ -1,8 +1,15 @@
 <?php
+/* v1.0 note: a lot of these settings are now stored in MySQL and are configurable from the admin menu */
 
 if (!isset($global) && $running_upgrade_script!=true)
 {
 	die(__FILE__." was included directly.  This file should only be included via inc.global.php.  Include() that one instead.");
+}
+
+if (file_exists("upgrade.php") && $running_upgrade_script!=true) {
+	
+	die("<font color=red>The file 'upgrade.php' was located on this server.</font>
+	<p>If you are in the process of upgrading, that's fine, please <a href=upgrade.php>Click here</a> to run the upgrade script.<p>If you are NOT in the process of upgrading then leaving this file on the server poses a serious security hazard. Please remove this file immediately.");
 }
 
 /**********************************************************/
@@ -51,7 +58,6 @@ define ("SITE_SHORT_TITLE", "Local Exchange");
 define ("DOWN_FOR_MAINTENANCE", false);
 define ("MAINTENANCE_MESSAGE", SITE_LONG_TITLE ." is currently down for maintenance.  Try back in a little while.");
 
-//
 
 /***************************************************************************************************/
 /***************** 01-12-08 - 19-12-08 Chris Macdonald (chris@cdmweb.co.uk) ************************/
@@ -71,45 +77,14 @@ $allowedHTML = array('em','i','b','a','br','ul','ol','li','center','img','p');
 // Should we remove any JavaScript found in incoming data? Yes we should.
 define("STRIP_JSCRIPT",true);
 
-// Do we want to display Inactive members in the Member List?
-define("SHOW_INACTIVE_MEMBERS",false);
-
-// Do we want to display the Rate alongside the offers/wants listings?
-define("SHOW_RATE_ON_LISTINGS",true);
-
-// Do we want to display the PostCode alongside the offers/wants listings?
-define("SHOW_POSTCODE_ON_LISTINGS",true);
-
-// ... if SHOW_POSTCODE_ON_LISTINGS is set to true, how much of the PostCode do we want to show?
-define("NUM_CHARS_POSTCODE_SHOW_ON_LISTINGS", 4); // Displays the first X number of characters of the PostCode (e.g. if set to 4, 'TR11 12A' becomes 'TR11')
-
-// Should admin have the option to override Balances on a per member basis? Link will appear in admin panel if set to TRUE 
-// Use with CAUTION to avoid the database going out of balance
-define("OVRIDE_BALANCES", false);
-
-// Do we want to allow members to invoice one-another via the site? (The invoicee is always given the option to confirm/reject payment of the invoice)
-define("MEMBERS_CAN_INVOICE",true);
-
-// Allow members to upload an image of themselves, to be displayed with their personal profile?
-define("ALLOW_IMAGES",true);
-
 // Member images are resized 'on-the-fly', keeping the original dimensions. Specify the maximum width the image is to be DOWN-sized to here.
 define("MEMBER_PHOTO_WIDTH",200); // in pixels
 
 // Do we want to UP-scale images that are smaller than MEMBER_PHOTO_WIDTH (may look a bit ugly and pixelated)?
 define("UPSCALE_SMALL_MEMBER_PHOTO",false);
 
-//define("MEMBER_PHOTO_HEIGHT",200); // NOT IN USE
-//define("MEMBER_PHOTO_WIDTH_THUMB",50); // NOT IN USE
-//define("MEMBER_PHOTO_HEIGHT_THUMB",50); // NOT IN USE
-// [TODO] IMAGE_MAX_SIZE? IMAGE_MIME_TYPES?
-
-// Do we want to enable the 'Social Networky' profile fields (age,sex,etc)?
-define("SOC_NETWORK_FIELDS",true);
-// [TODO] Would be good to be able to define unique Social Networking fields at this point using an Array
-
 // The options available in the 'How old is you?' dropdown (trying to be as innocuous as possible here with the defaults (e.g. 40's)- but feel free to provide more specific options)
-$agesArr = array('---','n/a','Under 18', '18-30','30\'s','40\'s','50\'s','60\'s','70\'s','Over 80');
+$agesArr = array('---','Under 18', '18-30','30\'s','40\'s','50\'s','60\'s','70\'s','Over 80','n/a',);
 
 // The options available in the 'What Sex are you?' dropdown. At the time of writing (01-12-2008) the defaults should be fine
 $sexArr = array("---", "Male","Female","n/a");
@@ -125,13 +100,6 @@ define("KEYWORD_SEARCH_DIR",true);
 // Allow members to Search the Members List? (Handy if the members list is long)
 define("SEARCHABLE_MEMBERS_LIST",true);
 
-// If, whilst processing a trade, the database is found to be out of balance, what should the system do?
-// FATAL = Aborts the trade and informs the user why
-// SILENT = Continues with trade, displays no notifications whatsoever (NOTE: you can still set the option below to have an email notification sent to the admin)
-define("OOB_ACTION","SILENT");
-
-// Should the system send the Admin an email when the database is found to be out of balance?
-define("OOB_EMAIL_ADMIN",true);
 
 // END 01-12-08 changes by chris
 
@@ -139,11 +107,10 @@ define("OOB_EMAIL_ADMIN",true);
 /******************** SITE CUSTOMIZATION **********************/
 
 // email addresses & phone number to be listed in the site
-define ("EMAIL_FEATURE_REQUEST","info@your-domain.org");
+define ("EMAIL_FEATURE_REQUEST","info@your-domain.org"); // (is this actually used anywhere???)
 define ("EMAIL_ADMIN","info@your-domain.org");
+
 define ("PHONE_ADMIN","360-321-1234"); // an email address may be substituted...
-define ("EMAIL_FROM", "From:". "reply-to@your-domain.org"); // to override EMAIL_ADMIN 
-																				// for replies
 
 // What should appear at the front of all pages?
 // Titles will look like "PAGE_TITLE_HEADER - PAGE_TITLE", or something 
@@ -166,15 +133,9 @@ define ("HOME_LOGO", "localx_black.png");
 define ("HOME_PIC", "localx_home.png");
 
 // What content should be in the site header and footer?
-define ("PAGE_HEADER_CONTENT", "<table align=center cellpadding=15 cellspacing=0 id=\"mainTable\"><tr><td id=\"header\" align=center><img src=\"http://".HTTP_BASE."/images/". HEADER_LOGO ."\" alt=\"". SITE_SHORT_TITLE . " logo\"></td><td id=\"header\"><h1 align=right><img src=\"http://".HTTP_BASE."/images/". HEADER_TITLE ."\"></h1></td></tr>");
+define ("PAGE_HEADER_CONTENT", "<table align=center cellpadding=15 cellspacing=0 id=\"mainTable\"><tr><td id=\"header\" align=center><a href=\"index.php\"><img src=\"http://".HTTP_BASE."/images/". HEADER_LOGO ."\" alt=\"". SITE_SHORT_TITLE . " logo\" border=0></a></td><td id=\"header\"><h1 align=right><img src=\"http://".HTTP_BASE."/images/". HEADER_TITLE ."\"></h1></td></tr>");
 
-//define ("PAGE_HEADER_CONTENT", "<table align=center cellpadding=15 cellspacing=0 id=\"mainTable\">");
-
-
-define ("PAGE_FOOTER_CONTENT", "<tr><td id=\"footer\" colspan=2><p align=center><strong>". SITE_LONG_TITLE ." </strong>&#8226; <a href=\"http://". SERVER_DOMAIN . SERVER_PATH_URL ."\">". SERVER_DOMAIN ."</a><br><a href=\"mailto:". EMAIL_ADMIN ."\">" . EMAIL_ADMIN ."</a> &#8226; ". PHONE_ADMIN ."<br><font size=\"-2\">Licensed under the <a href=\"http://www.gnu.org/copyleft/gpl.html\">GPL</a> &#8226; Local Exchange <a href=\"http://". SERVER_DOMAIN . SERVER_PATH_URL ."/info/credits.php\">Credits</a></td></tr></table><br>");
-
-//define ("PAGE_FOOTER_CONTENT", "</table><br>");
-
+define ("PAGE_FOOTER_CONTENT", "<tr><td id=\"footer\" colspan=2><p align=center><strong>". SITE_LONG_TITLE ." </strong>&#8226; <a href=\"http://". SERVER_DOMAIN . SERVER_PATH_URL ."\">". SERVER_DOMAIN ."</a><br><a href=\"mailto:". EMAIL_ADMIN ."\">" . EMAIL_ADMIN ."</a> &#8226; ". PHONE_ADMIN ."<br><font size=\"-2\">Licensed under the <a href=\"http://www.gnu.org/copyleft/gpl.html\">GPL</a> &#8226; Local Exchange UK Ver. ".LOCALX_VERSION." <a href=\"http://". SERVER_DOMAIN . SERVER_PATH_URL ."/info/credits.php\">Credits</a></td></tr></table><br>");
 
 /**********************************************************/
 /**************** DEFINE SIDEBAR MENU *********************/
@@ -220,51 +181,21 @@ $SECTIONS = array (
 /**********************************************************/
 /******************* GENERAL SETTINGS *********************/
 
-define ("USE_RATES",false); // If turned on, listings will include a "Rate" field
 define ("UNITS", "LETS Units");  // This setting affects functionality, not just text displayed, so if you want to use hours/minutes this needs to read "Hours" exactly.  All other unit descriptions are ok, but receive no special treatment (i.e. there is no handling of "minutes").
 
 
 /**************** Monthly fee related settings ********************/
-
-define("TAKE_MONTHLY_FEE", true);
-define("MONTHLY_FEE", 1);  // # of units.
 
 define("SYSTEM_ACCOUNT_ID", "system");
 $monthly_fee_exempt_list = array("ADMIN", SYSTEM_ACCOUNT_ID);
 
 // End of monthly fee related settings.
 
-
-
 define ("MAX_FILE_UPLOAD","5000000"); // Maximum file size, in bytes, allowed for uploads to the server
-define ("EMAIL_LISTING_UPDATES", false); // Should users receive automatic updates
-													 // for new and modified listings?
-define ("DEFAULT_UPDATE_INTERVAL", WEEKLY); // If automatic updates are sent, this is
-													 // the default interval. Possible
-													 // values are NEVER, DAILY, WEEKLY & MONTHLY.
+									 
 // The following text will appear at the beggining of the email update messages
 define ("LISTING_UPDATES_MESSAGE", "<h1>".SITE_LONG_TITLE."</h1>The following listings are new or updated.<p>If you would prefer not to receive automatic email updates, or if you would like to change their frequency, you can do so at the <a href=http://".HTTP_BASE."/member_edit.php?mode=self>Member Profile</a> area of our website.");
 
-// Should inactive accounts have their listings automatically expired?
-// This can be a useful feature.  It is an attempt to deal with the 
-// age-old local currency problem of new members joining and then not 
-// keeping their listings up to date or using the system in any way.  
-// It is designed so that if a member doesn't record a trade OR update 
-// a listing in a given period of time (default is six months), their 
-// listings will be set to expire and they will receive an email to 
-// that effect (as will the admin).
-define ("EXPIRE_INACTIVE_ACCOUNTS",false); 
-
-// If above is set, after this many days, accounts that have had no
-// activity will have their listings set to expire.  They will have 
-// to reactiveate them individually if they still want them.
-define ("MAX_DAYS_INACTIVE","180");  
-
-// How many days in the future the expiration date will be set for
-define ("EXPIRATION_WINDOW","15");	
-
-// How long should expired listings hang around before they are deleted?
-define ("DELETE_EXPIRED_AFTER","90"); 
 
 // The following message is the one that will be emailed to the person 
 // whose listings have been expired (a delicate matter).
@@ -370,5 +301,3 @@ define("LOAD_FROM_SESSION",-1);  // Not currently in use
 
 // URL to PHP page which handles redirects and such.
 define ("REDIRECT_URL",SERVER_PATH_URL."/redirect.php");
-
-?>

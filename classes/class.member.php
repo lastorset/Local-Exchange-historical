@@ -25,6 +25,7 @@ class cMember
 	var $account_type;
 	var $email_updates;
 	var $balance;
+	var $restriction;
 
 	function cMember($values=null) {
 		if ($values) {
@@ -251,6 +252,14 @@ class cMember
 
 	}
 	
+	function AccountIsRestricted() {
+		
+		if ($this->restriction==1)
+			return true;
+		
+		return false;
+	}
+	
 	function LoadMember($member, $redirect=true) {
 		global $cDB, $cErr;
 
@@ -258,7 +267,7 @@ class cMember
 		// select all Member data and populate the properties
 		//
 		/*[chris] adjusted to retrieve 'confirm_payments' */
-		$query = $cDB->Query("SELECT member_id, password, member_role, security_q, security_a, status, member_note, admin_note, join_date, expire_date, away_date, account_type, email_updates, balance, confirm_payments FROM ".DATABASE_MEMBERS." WHERE member_id=". $cDB->EscTxt($member));
+		$query = $cDB->Query("SELECT member_id, password, member_role, security_q, security_a, status, member_note, admin_note, join_date, expire_date, away_date, account_type, email_updates, balance, confirm_payments, restriction FROM ".DATABASE_MEMBERS." WHERE member_id=". $cDB->EscTxt($member));
 		
 		if($row = mysql_fetch_array($query))
 		{		
@@ -279,6 +288,8 @@ class cMember
 			
 			// [chris]		
 			$this->confirm_payments=$row[14];
+			$this->restriction=$row[15];
+		
 		}
 		else
 		{
@@ -827,6 +838,67 @@ class cBalancesTotal {
 			return false;
 		}		
 	}
+}
+
+class cIncomeTies extends cMember {
+	
+	function getTie($member_id) {
+		
+		global $cDB;
+		
+		$q = "select * from income_ties where member_id=".$cDB->EscTxt($member_id)." limit 0,1";
+		$result = $cDB->query($q);
+		
+		if (!$result)
+			return false;
+		
+		$row = mysql_fetch_object($result);
+		
+		return $row;
+	}
+	
+	function saveTie($data) {
+		
+		global $cDB;
+		
+		if (!cIncomeTies::getTie($data["member_id"])) { // has no tie, INSERT row
+			
+			$q = "insert into income_ties set member_id=".$cDB->EscTxt($data["member_id"]).",
+				 tie_id=".$cDB->EscTxt($data["tie_id"]).", percent=".$cDB->EscTxt($data["amount"])."";
+				
+		}
+		else { // has a tie, UPDATE row
+			
+				$q = "update income_ties set tie_id=".$cDB->EscTxt($data["tie_id"]).", percent=".$cDB->EscTxt($data["amount"])." where member_id=".$cDB->EscTxt($data["member_id"])."";
+		}
+		
+		$result = $cDB->Query($q);
+		
+		if (!$result)
+			return "Error saving Income Share.";
+			
+		return "Income Share saved successfully.";
+	}
+	
+	function deleteTie($member_id) {
+		
+		global $cDB;
+		
+			if (!cIncomeTies::getTie($member_id)) { // has no tie to delete!
+			
+				return "No Income Share to delete!";
+		}
+		
+		$q = "delete from income_ties where member_id=".$cDB->EscTxt($member_id)."";
+		
+		$result = $cDB->Query($q);
+		
+		if (!$result)
+			return "Error deleting income Share.";
+		
+		return "Income Share deleted successfully.";
+	}
+	
 }
 
 $cUser = new cMember();

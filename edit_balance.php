@@ -11,7 +11,7 @@ include("includes/inc.forms.php");
 // First, we define the form
 //
 
-$cUser->MustBeLevel(1);
+$cUser->MustBeLevel(2);
 
 if (OVRIDE_BALANCES!=true) // Provision for overriding member balances has been turned off, return to the admin menu
 	header("location:http://".HTTP_BASE."/admin_menu.php");

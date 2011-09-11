@@ -48,6 +48,7 @@ class cTrade {
 		$insert = $cDB->Query("INSERT INTO ". DATABASE_TRADES ." (trade_date, status, member_id_from, member_id_to, amount, category, description, type) VALUES (now(), ". $cDB->EscTxt($this->status) .", ". $cDB->EscTxt($this->member_from->member_id) .", ". $cDB->EscTxt($this->member_to->member_id) .", ". $cDB->EscTxt($this->amount) .", ". $cDB->EscTxt($this->category->id) .", ". $cDB->EscTxt($this->description) .", ". $cDB->EscTxt($this->type) .");");
 
 		if(mysql_affected_rows() == 1) {
+		
 			$this->trade_id = mysql_insert_id();	
 			$query = $cDB->Query("SELECT trade_date from ". DATABASE_TRADES ." WHERE trade_id=". $this->trade_id .";");
 			$row = mysql_fetch_array($query);
@@ -109,6 +110,11 @@ class cTrade {
 		if ($this->member_from->member_id == $this->member_to->member_id)
 			return false;		// don't allow trade to self
 		
+		if ($this->member_from->restriction==1) { // This member's account has been restricted - he is not allowed to make outgoing trades
+			
+			return false;
+		}
+	
 		$balances = new cBalancesTotal;
 	
 		// TODO: At some point, we should handle out-of-balance problems without shutting 
@@ -146,6 +152,7 @@ class cTrade {
 		$cDB->Query("BEGIN");
 		
 		if($this->SaveTrade()) {
+			
 			$success1 = $this->member_from->UpdateBalance(-($this->amount));
 			$success2 = $this->member_to->UpdateBalance($this->amount);
 			
@@ -223,7 +230,11 @@ class cTradeGroup {
             $trade_type_refund = TRADE_MONTHLY_FEE_REVERSAL;
 
         // Ignore monthly fees.
-		$query = $cDB->Query("SELECT trade_id FROM ".DATABASE_TRADES." WHERE (member_id_from LIKE ". $cDB->EscTxt($this->member_id) ." OR member_id_to LIKE ". $cDB->EscTxt($this->member_id) .") AND trade_date > ". $cDB->EscTxt($this->from_date) ." AND trade_date < ". $cDB->EscTxt(date("Ymd", $to_date)) ." AND type != '$trade_type' AND type != '$trade_type_refund' ORDER BY trade_date DESC");
+				if (SHOW_GLOBAL_FEES!=true)
+					$query = $cDB->Query("SELECT trade_id FROM ".DATABASE_TRADES." WHERE (member_id_from LIKE ". $cDB->EscTxt($this->member_id) ." OR member_id_to LIKE ". $cDB->EscTxt($this->member_id) .") AND trade_date > ". $cDB->EscTxt($this->from_date) ." AND trade_date < ". $cDB->EscTxt(date("Ymd", $to_date)) ." AND type!='S' AND type != '$trade_type' AND type != '$trade_type_refund' ORDER BY trade_date DESC");
+       	else
+       			$query = $cDB->Query("SELECT trade_id FROM ".DATABASE_TRADES." WHERE (member_id_from LIKE ". $cDB->EscTxt($this->member_id) ." OR member_id_to LIKE ". $cDB->EscTxt($this->member_id) .") AND trade_date > ". $cDB->EscTxt($this->from_date) ." AND trade_date < ". $cDB->EscTxt(date("Ymd", $to_date)) ." ORDER BY trade_date DESC");
+       	
         }
 
 		// instantiate new cTrade objects and load them
