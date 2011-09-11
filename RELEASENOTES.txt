@@ -1,3 +1,28 @@
+/* Local Exchange version 1.01 release notes */
+
+/* 02-02-2010 - changes by Chris Macdonald <chris@cdmweb.co.uk> and Rob Follett <robfol@gmail.com> */
+
+
+*****************************************************
+/* New 1.01 Functionality */
+
+/* ADDITIONAL TWEEKS/CHANGES/BUG FIXES */
+
+[FIX] Moved 'account expiration' settings out of MySQL back into the config file; this resolves a problem re site-sent emails not picking up the defined value of certain variables related to account expirations 
+
+*****************************************************
+/* FILES Changed */
+	
+	*includes/inc.config.php:
+		(): added account expiration settings
+	
+	*includes/inc.global.php:
+		(): Updated version number
+	*create_db.php
+	  (): 'account expiration' fields removed from MySQL	
+
+************************************************
+
 /* Local Exchange UK version 1.0 release notes */
 
 /* 22-06-2009 - changes by Chris Macdonald <chris@cdmweb.co.uk> and Rob Follett <robfol@gmail.com> */

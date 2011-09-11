@@ -196,6 +196,27 @@ define ("MAX_FILE_UPLOAD","5000000"); // Maximum file size, in bytes, allowed fo
 // The following text will appear at the beggining of the email update messages
 define ("LISTING_UPDATES_MESSAGE", "<h1>".SITE_LONG_TITLE."</h1>The following listings are new or updated.<p>If you would prefer not to receive automatic email updates, or if you would like to change their frequency, you can do so at the <a href=http://".HTTP_BASE."/member_edit.php?mode=self>Member Profile</a> area of our website.");
 
+// Should inactive accounts have their listings automatically expired?
+// This can be a useful feature.  It is an attempt to deal with the 
+// age-old local currency problem of new members joining and then not 
+// keeping their listings up to date or using the system in any way.  
+// It is designed so that if a member doesn't record a trade OR update 
+// a listing in a given period of time (default is six months), their 
+// listings will be set to expire and they will receive an email to 
+// that effect (as will the admin).
+define ("EXPIRE_INACTIVE_ACCOUNTS",false); 
+
+// If above is set, after this many days, accounts that have had no
+// activity will have their listings set to expire.  They will have 
+// to reactiveate them individually if they still want them.
+define ("MAX_DAYS_INACTIVE","180");  
+
+// How many days in the future the expiration date will be set for
+define ("EXPIRATION_WINDOW","15");	
+
+// How long should expired listings hang around before they are deleted?
+define ("DELETE_EXPIRED_AFTER","90"); 
+
 
 // The following message is the one that will be emailed to the person 
 // whose listings have been expired (a delicate matter).

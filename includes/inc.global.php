@@ -55,7 +55,7 @@ define("WEEKLY_LISTING_UPDATES","W"); // Logging event category - System Event
 define("MONTHLY_LISTING_UPDATES","M"); // Logging event category - System Event
 
 /*********************************************************/
-define("LOCALX_VERSION", "1.0");
+define("LOCALX_VERSION", "1.01");
 
 /**********************************************************/
 /***************** DATABASE VARIABLES *********************/

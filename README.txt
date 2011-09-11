@@ -5,19 +5,26 @@ Requirements:
 	- MySQL 3.23 or higher with InnoDB table support*
 	- Pear system and the libraries specified below 
 
-==== New version 1.0 UK ====
-N.B. - This package (localx-UK-1.0.zip) is for installing a NEW site using version 1.0 from scratch. 
+==== New version 1.01 UK ====
+N.B. - This package (localx-UK-1.01.zip) is for installing a NEW site using version 1.01 from scratch. 
 We suggest you read RELEASENOTES.txt before attempting to install for an overview and understanding of new features and bug fixes introduced since 0.3.2 
 
+Upgrading from version 0.3.2:
 If you already have a version of Local Exchange 0.3.2 installed, please 
 
 1) use the UPGRADE package (localexchange-upgrade-0.4.0.zip) and instructions contained within it instead of this archive to upgrade to version 0.4.0.  
 
+Upgrading from version 0.4.0:
 Once you have Local Exchange version 0.4.0 installed
 
 2) use the UPGRADE package (localx-UK-upgrade-0.4-to-1.0.zip) to upgrade to version 1.0 UK
 
-Please note that the current upgrade package (localx-UK-upgrade-0.4-to-1.0.zip)is ONLY for upgrading an existing site running version 0.4.0 to version 1.0 (version is defined as LOCALX_VERSION in includes/inc.global.php).
+Upgrading from version 1.0:
+Once you have Local Exchange UK version 1.0 installed
+
+3) use the UPGRADE package (localx-UK-upgrade-1.0-to-1.01.zip) to upgrade to version 1.01 UK
+
+Please note that the current upgrade package (localx-UK-upgrade-1.0-to-1.01.zip)is ONLY for upgrading an existing site running version 1.0 to version 1.01 (version is defined as LOCALX_VERSION in includes/inc.global.php).
 
 Chris Macdonald and Rob Follett
 ==============================
@@ -60,7 +67,7 @@ Ok, onward and upward.
 8) In order to use file uploading features (such as uploading a Newsletter), you will need to set the permissions on the "uploads" directory such that the web user account (often www-data) has access to write to it.
 
 Further Configuration:
-1) Edit style.css, inc.config.php and add graphics files to the "images" folder as needed to personalize the site.  The main site graphics can be modified be editing inc.config.php.
+1) Edit style.css, print.css, inc.config.php and add graphics files to the "images" folder as needed to personalize the site.  The main site graphics can be modified be editing inc.config.php.
 2) In the "info" folder are a number of essentially static html files that help to explain what local currency is.  Included among them is some information specific to the area the original developer of the system lives in (me, that is).  You may use these files as you like, of course, but you may want to tailor them to your needs.  The files themselves need to be edited with a text editor, there is no content editor included in the system currently. (RF: Update ver 0.4.0 - there *is* now an (optional) content editor built in for creating additional info pages which can be edited online - see includes/inc.config.php )
 3) Default listing categories were created by the create_db script.  You can edit these categories from the Administration menu.
 

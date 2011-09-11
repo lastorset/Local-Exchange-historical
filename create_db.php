@@ -151,7 +151,7 @@ $cDB->Query("CREATE TABLE trades_pending (
 
 /* END upgrade to 0.4.0 */
 
-/* BEGIN upgrade to 1.0 */
+/* BEGIN upgrade to 1.01 */
 
 
 // Some alterations to existing tables...
@@ -227,14 +227,6 @@ $cDB->Query("INSERT INTO `settings` VALUES ('28', 'EMAIL_LISTING_UPDATES', 'Send
 
 $cDB->Query("INSERT INTO `settings` VALUES ('29', 'DEFAULT_UPDATE_INTERVAL', 'Default Email Listings Update Interval', 'multiple', '', 'NEVER,WEEKLY,MONTHLY', 'NEVER', '', 'If automatic updates are sent, this is the default interval.', '1')") or die("Error - Could not insert row into settings table.");
 
-$cDB->Query("INSERT INTO `settings` VALUES ('30', 'EXPIRE_INACTIVE_ACCOUNTS', 'Expire Inactive Accounts ', 'bool', '', '', 'FALSE', '', 'Should inactive accounts have their listings automatically expired? This can be a useful feature.  It is an attempt to deal with the age-old local currency problem of new members joining and then not keeping their listings up to date or using the system in any way. It is designed so that if a member doesnt record a trade OR update a listing in a given period of time (default is six months), their listings will be set to expire and they will receive an email to that effect (as will the admin).', '5')") or die("Error - Could not insert row into settings table.");
-
-$cDB->Query("INSERT INTO `settings` VALUES ('31', 'MAX_DAYS_INACTIVE', 'Expire Accounts After x Days of Inactivity', 'int', '', '', '180', '', 'After this many days, accounts that have had no activity will have their listings set to expire.  They will have to reactiveate them individually if they still want them.', '5')") or die("Error - Could not insert row into settings table.");
-
-$cDB->Query("INSERT INTO `settings` VALUES ('32', 'EXPIRATION_WINDOW', 'Account Expiration Window', 'int', '', '', '15', '', 'How many days in the future the expiration date will be set for', '5')") or die("Error - Could not insert row into settings table.");
-
-$cDB->Query("INSERT INTO `settings` VALUES ('33', 'DELETE_EXPIRED_AFTER', 'Delete Expired Listings After x Days', 'int', '', '', '90', '', 'How long should expired listings hang around before they are deleted?', '5')") or die("Error - Could not insert row into settings table.");
-
 $cDB->Query("INSERT INTO `settings` VALUES ('34', 'ALLOW_INCOME_SHARES', 'Allow Income Sharing', 'bool', '', null, 'TRUE', '99999', 'Do you want to allow members to share a percentage of any income they generate with another account of their choosing? The member can specify the exact percentage they wish to donate.', '2')") or die("Error - Could not insert row into settings table.");
 
 $cDB->Query("INSERT INTO `settings` VALUES ('35', 'LEECH_NOTICE', 'Message Displayed to Leecher who tries to trade', 'longtext', '', '', 'Restrictions have been imposed on your account which prevent you from trading outwards, Please contact the administrator for more information.', '', 'Leecher sees this notice when trying to send money.', '3')") or die("Error - Could not insert row into settings table.");
@@ -242,7 +234,7 @@ $cDB->Query("INSERT INTO `settings` VALUES ('35', 'LEECH_NOTICE', 'Message Displ
 $cDB->Query("INSERT INTO `settings` VALUES ('36', 'SHOW_GLOBAL_FEES', 'Show monthly fees and service charges in global exchange view', 'bool', '', null, 'FALSE', '', 'Do you want to show monthly fees and service charges in the global exchange view? (Note: individual members will still be able to see this in their own personal exchange history).', '7')") or die("Error - Could not insert row into settings table.");
 
 
-/* END upgrade to 1.0 */
+/* END upgrade to 1.01 */
 
 				
 $p->DisplayPage("Database has been created. Click <A HREF=member_login.php>here</A> to login.");
